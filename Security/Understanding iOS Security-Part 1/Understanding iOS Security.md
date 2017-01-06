@@ -26,7 +26,6 @@ boot ROM里有几个漏洞是可以被利用的，不仅可以刷boot loader，�
 
 ![Secure Enclave](Secure Enclave.png)  
 
-
 如图，一个被称为“secure mode”的模块被加载进处理器中，简单说，就是有两个处理器架构被装在一个设备里。第一个是普通的ios app（user mode）第二个是只执行受信任的代码（secure mode）。数据被写入RAM里时，处于安全监控模式下的user mode是无法访问的。这篇博客[链接](http://blog.fortinet.com/2013/09/16/iphone5s-inside-the-secure-enclave)解释了在指纹解锁时Secure Enclave是如何工作  
 * 用户按下手指  
 * 锁屏服务调用secure world的api 
@@ -36,4 +35,9 @@ boot ROM里有几个漏洞是可以被利用的，不仅可以刷boot loader，�
 * 必要的密码认证处理完毕&授予访问权限  
 
 ##Code Signing  
-Apps
+   Apps对于移动系统是个非常重要的组件。apple相信强制严格的安全级别对于整个设备的安全是非常重要的。代码签名是一步。简单来说，apple不允许在其跑未授权的app。确保所有app可信，授权，和没有被篡改。总之，以上讨论的证书链是从boot loader到OS再到app。
+   如果公司要使用 in house app，他们需要申请iOS Developer Enterprise program (iDEP)。一旦公司成为iDEP，需要注册获取 Provisioning Profile。In-house apps 会在运行期间检查签名的有效性，带有已过期和失效的apps是不能跑的。 
+   
+   ![Code Signing](Code Signing.tiff)  
+   
+   本章我们讨论了三个主要安全功能，secure boot process, Secure Enclave, application signing。下一章我们会看看其他功能，比如数据保护，加密等等。 ‘Til then, Happy Hacking! 
