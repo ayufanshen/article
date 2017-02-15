@@ -1,6 +1,6 @@
 ---  
 layout: post  
-title: "MagicalRecord（上）"  
+title: "MagicalRecord"  
 description: ""  
 category: ios  
 tags: [CoreData]  
@@ -8,7 +8,7 @@ author: 饭小团
 ---   
 
 
-#MagicalRecord（上）  
+#MagicalRecord  
 
 安装：
 	
@@ -244,20 +244,49 @@ completion的block在主线程，对于UI更新是安全的。
 	NSUInteger count = [Person MR_numberOfEntitiesWithContext:someOtherContext];  
 	
 
+##Saving Entities
 
+###When should I save?  
 
+普通情况下，你的数据只要变化就要存储到persistent store里。不过，有的app会在application termination时存储。但这并不是好方案，如果用户手动杀进程或app 奔溃了呢？这些糟糕的体验要尽早避免。  
 
+如果你发现存储需要花费很长时间，这里倒是有几条建议：
 
+##### 1.Save in a background thread: 
+	
+	[MagicalRecord saveWithBlock:^(NSManagedObjectContext *localContext) {
 
+    // Do your work to be saved here, against the `localContext` instance
+    // Everything you do in this block will occur on a background thread
 
+	} completion:^(BOOL success, NSError *error) {
+   	 [application endBackgroundTask:bgTask];
+   	 bgTask = UIBackgroundTaskInvalid;
+	}];  
+	
+	
+##Handling Long-running Saves  
+在ios上 
+当app退出时，会有一小会时间收拾和存储数据到磁盘。你倒是可以请求延长一段app的截止时间： 
+	
+	UIApplication *application = [UIApplication sharedApplication];
 
+	__block UIBackgroundTaskIdentifier bgTask = [application beginBackgroundTaskWithExpirationHandler:^{
+    	[application endBackgroundTask:bgTask];
+    	bgTask = UIBackgroundTaskInvalid;
+	}];
 
+	[MagicalRecord saveWithBlock:^(NSManagedObjectContext *localContext) {
 
+   		 // Do your work to be saved here
 
+	} completion:^(BOOL success, NSError *error) {
+    	[application endBackgroundTask:bgTask];
+    	bgTask = UIBackgroundTaskInvalid;
+	}];
+不过时间别太长了，否则苹果会拒  
 
-
-
-
+其他文章就不写了，具体可以看[这里](https://github.com/magicalpanda/MagicalRecord)，基本是一时半会不太用得着的。
 
 
 
